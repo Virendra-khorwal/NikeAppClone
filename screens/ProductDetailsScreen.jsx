@@ -9,6 +9,7 @@ import {
   Pressable,
 } from "react-native";
 import products from "../data/products";
+import { FontAwesome } from "@expo/vector-icons";
 
 const { width } = Dimensions.get("window");
 
@@ -40,8 +41,8 @@ const ProductDetailsScreen = () => {
       </ScrollView>
 
       <Pressable onPress={addToCart} style={styles.button}>
+        <FontAwesome name="cart-plus" size={24} color="white" />
         <Text style={styles.buttonText}>Add to Cart</Text>
-        
       </Pressable>
     </View>
   );
@@ -80,6 +81,8 @@ const styles = StyleSheet.create({
     bottom: 30,
     padding: 16,
     width: '90%',
+    flexDirection: 'row',
+    gap: 10,
   },
   buttonText: {
     fontSize: 16,
