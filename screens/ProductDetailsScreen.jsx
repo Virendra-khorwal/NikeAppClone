@@ -10,11 +10,12 @@ import {
 } from "react-native";
 import products from "../data/products";
 import { FontAwesome } from "@expo/vector-icons";
+import { useSelector } from "react-redux";
 
 const { width } = Dimensions.get("window");
 
 const ProductDetailsScreen = () => {
-  const product = products[0];
+  const product = useSelector((state) => state.products.selectedProduct);
 
   const addToCart = () => {
     console.warn("Added to cart");
@@ -70,6 +71,7 @@ const styles = StyleSheet.create({
     lineHeight: 30,
     fontSize: 18,
     fontWeight: "300",
+    marginBottom: 100,
   },
   button: {
     backgroundColor: "black",
