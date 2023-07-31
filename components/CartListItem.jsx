@@ -21,7 +21,7 @@ const CartListItem = ({ cartItem }) => {
       <Image source={{ uri: cartItem.product.image }} style={styles.image} />
       <View style={styles.contentContainer}>
         <Text style={styles.name}>{cartItem.product.name}</Text>
-        <Text style={styles.size}>Size {cartItem.size}</Text>
+        <Text style={styles.size}>Size {cartItem.product.size}</Text>
 
         <View style={styles.footer}>
           <Feather
@@ -37,7 +37,7 @@ const CartListItem = ({ cartItem }) => {
             color="gray"
             onPress={increaseQuantity}
           />
-          <Text style={styles.itemTotal}>$320.0</Text>
+          <Text style={styles.itemTotal}>${cartItem.product.price * cartItem.quantity}</Text>
         </View>
       </View>
     </View>
