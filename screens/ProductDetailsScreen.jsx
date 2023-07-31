@@ -10,15 +10,25 @@ import {
 } from "react-native";
 import products from "../data/products";
 import { FontAwesome } from "@expo/vector-icons";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+
+import { addToCartItem } from "../store/cartSlice";
+import { useState } from "react";
 
 const { width } = Dimensions.get("window");
 
 const ProductDetailsScreen = () => {
   const product = useSelector((state) => state.products.selectedProduct);
+  const [loading, setLoading] = useState(false);
+
+  const dispatch = useDispatch();
+  const cart = useSelector((state) => state.cart.item);
+
+  // const isAlreadyInCart = cart.findIndex((item) => item.id === product.id) > -1;
+
 
   const addToCart = () => {
-    console.warn("Added to cart");
+    dispatch(addToCartItem({product}));
   }
 
   return (
@@ -42,6 +52,14 @@ const ProductDetailsScreen = () => {
       </ScrollView>
 
       <Pressable onPress={addToCart} style={styles.button}>
+        {/* { isAlreadyInCart ? (
+          <Text style={{color: 'white'}}> Go to cart</Text>
+        ) : (
+          <>
+            <FontAwesome name="cart-plus" size={24} color="white" />
+            <Text style={styles.buttonText}>Add to Cart</Text>
+          </>
+        )} */}
         <FontAwesome name="cart-plus" size={24} color="white" />
         <Text style={styles.buttonText}>Add to Cart</Text>
       </Pressable>
