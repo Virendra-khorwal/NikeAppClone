@@ -1,9 +1,16 @@
-import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
-import { useSelector } from "react-redux";
+import { Alert, FlatList, Pressable, StyleSheet, Text, View } from "react-native";
+import { useDispatch, useSelector } from "react-redux";
 
 import CartListItem from "../components/CartListItem";
-import { selectSubCartTotal, selectDeliveryFee, selectTotal  } from "../store/cartSlice";
+import {
+  selectSubCartTotal,
+  selectDeliveryFee,
+  selectTotal,
+  clearCart,
+} from "../store/cartSlice";
 
+
+import { useCreateOrderMutation } from "../store/apiSlice";
 
 const ShoppingCartTotals = ({subTotal, deliveryFee, total}) => (
   <View style={styles.totalContainer}>
@@ -28,7 +35,31 @@ const ShoppingCart = () => {
   const cartSubTotal = useSelector(selectSubCartTotal)
   const deliveryFee = useSelector(selectDeliveryFee)
   const total = useSelector(selectTotal)
+  const dispatch = useDispatch()
+
+  const [createOrder, {data, error, isLoading}] = useCreateOrderMutation();
   
+  const onCreateOrder = async() => {
+    const result = await createOrder({
+      items: cart,
+      subTotal: cartSubTotal,
+      deliveryFee: deliveryFee,
+      total: total,
+      customer: {
+        name: "John Doe",
+        phone: "1234567890",
+        address: "123 Main St",
+        city: "New York",
+        postalCode: "12345",
+        country: "USA"
+      }
+    })
+
+    if(result.data?.status ==="OK") {
+      Alert.alert("Success", `Your order has been placed successfully. Your order reference is : ${result.data.data.ref}`)
+      dispatch(clearCart());
+    }
+  }
 
   return (
     <>
@@ -37,8 +68,10 @@ const ShoppingCart = () => {
         renderItem={({ item }) => <CartListItem cartItem={item} />}
         ListFooterComponent={() => <ShoppingCartTotals subTotal={cartSubTotal} deliveryFee={deliveryFee} total={total} />}
       />
-      <Pressable onPress={() => {}} style={styles.button}>
-        <Text style={styles.buttonText}>Checkout</Text>
+      <Pressable onPress={onCreateOrder} style={styles.button}>
+        <Text style={styles.buttonText}>
+          {isLoading ? "Placing Order..." : "Checkout"}
+          </Text>
       </Pressable>
     </>
   );

@@ -27,6 +27,7 @@ const ProductDetailsScreen = ({ route }) => {
   // const cart = useSelector((state) => state.cart.item);
 
   // const isAlreadyInCart = cart.findIndex((item) => item.id === product.id) > -1;
+  const product = data?.data;
 
   const addToCart = () => {
     dispatch(addToCartItem({ product }));
@@ -40,7 +41,6 @@ const ProductDetailsScreen = ({ route }) => {
     return <Text>Error Fetching Products {error.error} </Text>;
   }
 
-  const product = data.data;
 
   return (
     <View>
