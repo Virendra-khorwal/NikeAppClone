@@ -7,29 +7,40 @@ import {
   Dimensions,
   ScrollView,
   Pressable,
+  ActivityIndicator,
 } from "react-native";
-import products from "../data/products";
+// import products from "../data/products";
 import { FontAwesome } from "@expo/vector-icons";
 import { useDispatch, useSelector } from "react-redux";
 
 import { addToCartItem } from "../store/cartSlice";
 import { useState } from "react";
+import { useGetProductQuery } from "../store/apiSlice";
 
 const { width } = Dimensions.get("window");
 
-const ProductDetailsScreen = () => {
-  const product = useSelector((state) => state.products.selectedProduct);
-  const [loading, setLoading] = useState(false);
+const ProductDetailsScreen = ({ route }) => {
+  const id = route.params.id;
+  const { data, isLoading, error } = useGetProductQuery(id);
 
   const dispatch = useDispatch();
-  const cart = useSelector((state) => state.cart.item);
+  // const cart = useSelector((state) => state.cart.item);
 
   // const isAlreadyInCart = cart.findIndex((item) => item.id === product.id) > -1;
 
-
   const addToCart = () => {
-    dispatch(addToCartItem({product}));
+    dispatch(addToCartItem({ product }));
+  };
+
+  if (isLoading) {
+    return <ActivityIndicator />;
   }
+
+  if (error) {
+    return <Text>Error Fetching Products {error.error} </Text>;
+  }
+
+  const product = data.data;
 
   return (
     <View>
@@ -100,8 +111,8 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     bottom: 30,
     padding: 16,
-    width: '90%',
-    flexDirection: 'row',
+    width: "90%",
+    flexDirection: "row",
     gap: 10,
   },
   buttonText: {
