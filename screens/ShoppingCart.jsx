@@ -9,8 +9,8 @@ import {
   clearCart,
 } from "../store/cartSlice";
 
-
-import { useCreateOrderMutation } from "../store/apiSlice";
+import { useCreateOrderMutation, useCreatePaymentIntentMutation } from "../store/apiSlice";
+import {useStripe} from '@stripe/stripe-react-native'
 
 const ShoppingCartTotals = ({subTotal, deliveryFee, total}) => (
   <View style={styles.totalContainer}>
@@ -38,6 +38,41 @@ const ShoppingCart = () => {
   const dispatch = useDispatch()
 
   const [createOrder, {data, error, isLoading}] = useCreateOrderMutation();
+  const [createPaymentIntent] = useCreatePaymentIntentMutation();
+
+  const {initPaymentSheet, presentPaymentSheet} = useStripe()
+
+  const onCheckout = async() => {
+
+    const response = await createPaymentIntent({ amount: Math.floor(total*100)});
+
+    if(response.error) {
+      
+      Alert.alert("Something went wrong");
+      return;
+    }
+
+    const initResponse = await initPaymentSheet({
+      merchantDisplayName: 'Virendra Khorwal',
+      paymentIntentClientSecret: response.data.client_secret,
+    })
+
+    if(initResponse.error) {
+      console.log(error);
+      Alert.alert('Something went Wrong');
+      return;
+    }
+
+    const paymentResponse = await presentPaymentSheet();
+
+    if(paymentResponse.error){
+      Alert.alert(
+        `Error code: ${paymentResponse.error.code}`, paymentResponse.error.message
+      )
+      return;
+    }
+    onCreateOrder();
+  }
   
   const onCreateOrder = async() => {
     const result = await createOrder({
@@ -68,7 +103,7 @@ const ShoppingCart = () => {
         renderItem={({ item }) => <CartListItem cartItem={item} />}
         ListFooterComponent={() => <ShoppingCartTotals subTotal={cartSubTotal} deliveryFee={deliveryFee} total={total} />}
       />
-      <Pressable onPress={onCreateOrder} style={styles.button}>
+      <Pressable onPress={onCheckout} style={styles.button}>
         <Text style={styles.buttonText}>
           {isLoading ? "Placing Order..." : "Checkout"}
           </Text>
